@@ -1,0 +1,4 @@
+
+data/caudal_extra.csv
+*.pyc
+*.npz

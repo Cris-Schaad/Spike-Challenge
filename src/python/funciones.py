@@ -186,7 +186,6 @@ def sampling_temporal(x, y, ventana_de_tiempo, espacio_de_tiempo, time_step = 1,
                 indx_left=False
         
         if len(sampled_x) > 0:
-#            print(len(sampled_x))
             x_sampleado.append(np.asarray(sampled_x))
             y_sampleado.append(np.asarray(sampled_y))
           
