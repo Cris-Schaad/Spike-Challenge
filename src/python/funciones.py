@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import itertools
+import os, itertools
+from pathlib import Path
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
@@ -24,6 +26,9 @@ def time_plot_una_estacion(codigo_estacion, columna, fecha_min, fecha_max):
     fecha_max = np.datetime64(str(fecha_max), 'h')
 
     datos_estacion = pd.read_csv('caudal_extra.csv', header=0)
+    #Importación de dataset
+    datadir = os.path.join(Path(os.getcwd()).parent.parent, 'data')
+    datos_estacion = pd.read_csv(os.path.join(datadir, 'caudal_extra.csv'), header=0)
     datos_estacion = datos_estacion.sort_values(by=['nombre', 'fecha'])
     datos_estacion = datos_estacion[datos_estacion['codigo_estacion']==int(codigo_estacion)]
     
@@ -62,6 +67,9 @@ def time_plot_estaciones_varias_columnas(codigo_estacion, columnas, fecha_min, f
     fecha_max = np.datetime64(str(fecha_max), 'h')
 
     datos_estacion = pd.read_csv('caudal_extra.csv', header=0)
+    #Importación de dataset
+    datadir = os.path.join(Path(os.getcwd()).parent.parent, 'data')
+    datos_estacion = pd.read_csv(os.path.join(datadir, 'caudal_extra.csv'), header=0)
     datos_estacion = datos_estacion.sort_values(by=['nombre', 'fecha'])
     datos_estacion = datos_estacion[datos_estacion['codigo_estacion']==int(codigo_estacion)]
     

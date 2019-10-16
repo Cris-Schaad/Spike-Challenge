@@ -54,6 +54,7 @@ labs_t = dataset[dataset['nombre']==nombre_ejemplo]['temp_extremo'].values.astyp
 funciones.plot_eventos_extremos(nombre_ejemplo, 'caudal', fechas, caudal_ejemplo, labs_c)
 funciones.plot_eventos_extremos(nombre_ejemplo, 'precipitación promedio', fechas, precip_ejemplo, labs_p)
 funciones.plot_eventos_extremos(nombre_ejemplo, 'temperatura maxima promedio', fechas, temp_ejemplo, labs_t)
+funciones.plot_eventos_extremos(nombre_ejemplo, 'temperatura máxima promedio', fechas, temp_ejemplo, labs_t)
 
 
 #Creacion de dataset para entrenar
