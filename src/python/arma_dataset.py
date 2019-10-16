@@ -74,23 +74,9 @@ for i in dataset.nombre.unique():
 x_data = np.asarray(x_data)   
 y_data = np.asarray(y_data)   
 
-
 #Division de dataset
 x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2)
 x_train, x_valid, y_train, y_valid = train_test_split(x_train, y_train, test_size=0.2)
-
-
-#Escalado de datos
-sc_x =  MinMaxScaler(feature_range=(0,1))
-sc_x.fit_transform(np.concatenate(x_train))
-
-for sample in range(len(x_train)):
-    x_train[sample] = sc_x.transform(x_train[sample])
-for sample in range(len(x_valid)):
-    x_valid[sample] = sc_x.transform(x_valid[sample])
-for sample in range(len(x_test)):
-    x_test[sample] = sc_x.transform(x_test[sample])
-
 
 #Formateo de datos
 ventana_de_tiempo = 7
@@ -108,6 +94,18 @@ x_test = np.concatenate(x_test)
 y_train = np.concatenate(y_train).flatten()
 y_valid = np.concatenate(y_valid).flatten()
 y_test = np.concatenate(y_test).flatten()
+
+#Escalado de datos
+sc_x =  MinMaxScaler(feature_range=(0,1))
+sc_x.fit_transform(np.concatenate(x_train))
+
+for sample in range(len(x_train)):
+    x_train[sample] = sc_x.transform(x_train[sample])
+for sample in range(len(x_valid)):
+    x_valid[sample] = sc_x.transform(x_valid[sample])
+for sample in range(len(x_test)):
+    x_test[sample] = sc_x.transform(x_test[sample])
+
 
 #Guardado
 np.savez(os.path.join(datadir, 'caudal_extra.npz'),

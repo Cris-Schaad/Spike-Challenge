@@ -161,7 +161,6 @@ def sampling_temporal(x, y, ventana_de_tiempo, espacio_de_tiempo, time_step = 1,
     -------
     x, y sampleados
     """       
-    
     x_sampleado = []
     y_sampleado = []
     for i in range(x.shape[0]):

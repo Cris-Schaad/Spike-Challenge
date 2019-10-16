@@ -38,7 +38,7 @@ model.summary()
 adam = optimizers.adam(lr=0.001)
 model.compile(optimizer = adam, loss = 'binary_crossentropy', metrics=['accuracy'])
 
-model_history = model.fit(x_train, y_train, batch_size = 256, epochs = 20, validation_data = (x_valid, y_valid), 
+model_history = model.fit(x_train, y_train, batch_size = 256, epochs = 50, validation_data = (x_valid, y_valid), 
                           class_weight ={0:1/prop_evento_normal, 1:1/prop_evento_extremo}) #, verbose = 1)
 
 #Gr'afico loss entrenamiento
