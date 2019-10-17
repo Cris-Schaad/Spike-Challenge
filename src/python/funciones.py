@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import itertools
 import os, itertools
 from pathlib import Path
 from scipy.stats import norm
@@ -25,7 +24,6 @@ def time_plot_una_estacion(codigo_estacion, columna, fecha_min, fecha_max):
     fecha_min = np.datetime64(str(fecha_min), 'h')
     fecha_max = np.datetime64(str(fecha_max), 'h')
 
-    datos_estacion = pd.read_csv('caudal_extra.csv', header=0)
     #Importación de dataset
     datadir = os.path.join(Path(os.getcwd()).parent.parent, 'data')
     datos_estacion = pd.read_csv(os.path.join(datadir, 'caudal_extra.csv'), header=0)
@@ -66,7 +64,6 @@ def time_plot_estaciones_varias_columnas(codigo_estacion, columnas, fecha_min, f
     fecha_min = np.datetime64(str(fecha_min), 'h')
     fecha_max = np.datetime64(str(fecha_max), 'h')
 
-    datos_estacion = pd.read_csv('caudal_extra.csv', header=0)
     #Importación de dataset
     datadir = os.path.join(Path(os.getcwd()).parent.parent, 'data')
     datos_estacion = pd.read_csv(os.path.join(datadir, 'caudal_extra.csv'), header=0)
@@ -124,31 +121,119 @@ def evento_extremo(x, interval_c = 0.95):
     return labels
 
 
-def plot_eventos_extremos(nombre, variable, fechas, datos, labels):
+def estacionalidad_y_eventos_extremos(dataset):
+
+    """
+    Determina la estacionalidad de los datos, y clasifica el tipo de dato (normal o extremo)
+
+    Arguments
+    ----------
+    dataset: Pandas DataFrame
+
+    -------
+    Retorna
+    
+    dataset: Pandas DataFrame
+    """    
+    
+    dataset['Verano'] = pd.Series(np.zeros(len(dataset)))
+    dataset['Otoño'] = pd.Series(np.zeros(len(dataset)))
+    dataset['Invierno'] = pd.Series(np.zeros(len(dataset)))
+    dataset['Primavera'] = pd.Series(np.zeros(len(dataset)))
+    dataset['Dia'] = pd.Series(np.zeros(len(dataset)))
+    
+    #Asignación de estacionalidad
+    meses = pd.to_datetime(dataset['fecha']).dt.month.values
+    dias = pd.to_datetime(dataset['fecha']).dt.dayofyear.values
+    dataset.loc[dataset.index, 'Verano'] = np.logical_and(meses >= 1, meses <= 3).astype(int)
+    dataset.loc[dataset.index, 'Otoño'] = np.logical_and(meses >= 4, meses <= 6).astype(int)
+    dataset.loc[dataset.index, 'Invierno'] = np.logical_and(meses >= 7, meses <= 9).astype(int)
+    dataset.loc[dataset.index, 'Primavera'] = np.logical_and(meses >= 10, meses <= 12).astype(int)
+    dataset.loc[dataset.index, 'Dia'] = dias.astype(int)
+    
+    
+    #Determinación de eventos extremos
+    dataset['caudal_extremo'] = pd.Series(np.zeros(len(dataset)))
+    dataset['precip_extremo'] = pd.Series(np.zeros(len(dataset)))
+    dataset['temp_extremo'] = pd.Series(np.zeros(len(dataset)))
+    
+    
+    for i in dataset.nombre.unique():
+        datos_estacion = dataset[dataset['nombre'] == i]
+        for est in ['Verano', 'Otoño', 'Invierno', 'Primavera']:
+            datos = datos_estacion[datos_estacion[est]==1]
+            dataset.loc[datos.index, 'caudal_extremo'] = evento_extremo(datos['caudal'].values)
+            dataset.loc[datos.index, 'precip_extremo'] = evento_extremo(datos['precip_promedio'].values)
+            dataset.loc[datos.index, 'temp_extremo'] = evento_extremo(datos['temp_max_promedio'].values)     
+            
+    return dataset
+
+
+def plot_eventos_extremos_historicos(nombre_ejemplo, dataset, var):
  
     """
     Grafica registro historicos de variable distinguiendo eventos extremos 
     
     Parametros
     ----------
-    nombre: str nombre estacion de medicion
-    variable: str nombre de variable
-    fechas: array 1-d con fechas de datos (datetime64[D])
-    datos: array 1-d con datos
-    labels: array 1-d con labels de datos (labels binarias: normal (0), evento extremo(1))
+    nombre_ejemplo: str nombre estacion de medicion
+    dataset: pandas DataFrame con categorización de eventos hecha
+    var: str, puede ser 'Caudal', 'Precipitación promedio' o 'Temperatura máxima promedio'
 
     -------
     """   
-    
+    fechas = dataset[dataset['nombre']==nombre_ejemplo]['fecha'].values.astype('datetime64[D]')
+
+    if var == 'Caudal':
+        datos_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['caudal'].values
+        labels_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['caudal_extremo'].values.astype(int)
+    if var == 'Precipitación promedio':
+        datos_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['precip_promedio'].values
+        labels_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['precip_extremo'].values.astype(int)
+    if var == 'Temperatura máxima promedio':
+        datos_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['temp_max_promedio'].values
+        labels_ejemplo = dataset[dataset['nombre']==nombre_ejemplo]['temp_extremo'].values.astype(int)
+
     plt.figure(figsize=(12,4))
-    plt.scatter(fechas[np.where(~labels)], datos[np.where(~labels)], c='green', label='Normal', s=3)
-    plt.scatter(fechas[np.where(labels)], datos[np.where(labels)], c='red', label='Evento extremo', s=3)
+    plt.scatter(fechas[np.where(~labels_ejemplo)], datos_ejemplo[np.where(~labels_ejemplo)], c='green', label='Normal', s=3)
+    plt.scatter(fechas[np.where(labels_ejemplo)], datos_ejemplo[np.where(labels_ejemplo)], c='red', label='Evento extremo', s=3)
     plt.legend()
-    plt.title('Registro histórico de '+variable+' para '+nombre)
+    plt.title('Registro histórico de '+var+' para '+nombre_ejemplo)
     plt.xlabel('Fecha')
-    plt.ylabel(variable)
+    plt.ylabel(var)
     
     return None
+
+
+def plot_eventos_acumulados(dataframe):
+    
+    """
+    Grafica registro historicos de variable distinguiendo eventos extremos 
+    
+    Parametros
+    ----------
+    dataframe: dataframe de 2 columnas: la primera es de fechas, la segunda de 
+    una de las variables de eventos extremos
+
+    -------
+    """      
+    
+    dataframe = dataframe.sort_values(by=['fecha'])    
+    t = dataframe.iloc[:,0].values.astype('datetime64[D]')
+    y = dataframe.iloc[:,1].values
+    ylabel = dataframe.columns.values[-1]
+    t = t[~np.isnan(y)]
+    y = y[~np.isnan(y)].cumsum()
+    y = y/np.linspace(0, len(y), len(y))
+    
+    plt.figure()
+    plt.plot(t, y)
+    plt.xlabel('Fecha')
+    plt.ylabel(ylabel)
+    plt.title('Proporción de eventos de '+str(ylabel))  
+    
+    return None
+
 
 def sampling_temporal(x, y, ventana_de_tiempo, espacio_de_tiempo, time_step = 1, flatten_data=True):
  

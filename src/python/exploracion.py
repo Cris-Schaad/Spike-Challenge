@@ -19,7 +19,7 @@ print('Cantidad de estaciones de medicion distintas: ', len(dataset.nombre.uniqu
 #Analisis de mediciones por estación
 cantiadad_mediciones = []
 for i in dataset.nombre.unique():
-        cantiadad_mediciones.append(dataset[dataset['nombre'] == i].shape[0])
+    cantiadad_mediciones.append(dataset[dataset['nombre'] == i].shape[0])
         
 print('\nMinimma cantidad de datos registrados en una estación: ', np.min(cantiadad_mediciones))
 print('Máxima cantidad de datos registrados en una estación: ', np.max(cantiadad_mediciones))
@@ -64,8 +64,30 @@ plt.ylabel('Cantidad de datos faltantes')
 plt.title('Distribución de datos faltantes')
 
 
-#Gráficos pedidos
+#Gráficos pedidos parte 2
 estacion_1 = 7355002    #Rio Ancoa En El Morro
 estacion_2 = 2104002    #Rio Loa En Salida Embalse Conchi
 funciones.time_plot_una_estacion(estacion_1, 'temp_max_promedio', '2000-01-01', '2005-01-01')
 funciones.time_plot_estaciones_varias_columnas(estacion_2, ['caudal','precip_promedio','temp_max_promedio'], '2010-01-01', '2015-01-01')
+
+
+#Aginación de estacion del año a registros
+dataset = funciones.estacionalidad_y_eventos_extremos(dataset)
+
+
+#Gráficos eventos extremos
+funciones.plot_eventos_extremos_historicos('Rio Turbio En Varillar', dataset, 'Caudal')
+funciones.plot_eventos_extremos_historicos('Rio Turbio En Varillar', dataset, 'Precipitación promedio')
+funciones.plot_eventos_extremos_historicos('Rio Turbio En Varillar', dataset, 'Temperatura máxima promedio')
+
+
+#Gráficos caudales extremos
+funciones.plot_eventos_extremos_historicos('Rio Loa En Salida Embalse Conchi', dataset, 'Caudal')
+funciones.plot_eventos_extremos_historicos('Rio Aconcagua En San Felipe', dataset, 'Caudal')
+funciones.plot_eventos_extremos_historicos('Rio Aysen En Puerto Aysen', dataset, 'Caudal')
+
+
+#Gráficos proporciond eventos extremos
+funciones.plot_eventos_acumulados(dataset[['fecha','caudal_extremo']])
+funciones.plot_eventos_acumulados(dataset[['fecha','precip_extremo']])
+funciones.plot_eventos_acumulados(dataset[['fecha','temp_extremo']])
