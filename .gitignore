@@ -2,3 +2,4 @@
 data/caudal_extra.csv
 *.pyc
 *.npz
+src/jupyter/.ipynb_checkpoints/arma_dataset-checkpoint.ipynb
