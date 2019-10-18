@@ -18,14 +18,6 @@ dataset = funciones.estacionalidad_y_eventos_extremos(dataset)
 x_data = []
 y_data = []
 nombres = []
-x_data_columnas = ['caudal','precip_promedio','temp_max_promedio','Verano','Otoño','Invierno','Primavera']
-y_data_columnas = ['caudal_extremo']
-
-
-#Creacion de dataset para entrenar
-x_data = []
-y_data = []
-nombres = []
 x_data_columnas = ['caudal','precip_promedio','temp_max_promedio','Dia']
 y_data_columnas = ['caudal_extremo']
 
