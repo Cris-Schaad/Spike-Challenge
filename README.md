@@ -1,6 +1,6 @@
 # Spike-Challenge
 
-## Análsis de datos de caudales de rios en Chile para predicción de eventos extremos para spike Labs.
+## Análsis de datos de caudales de rios en Chile: predicción de eventos extremos (Spike Labs)
 
 Se requiere que el dataset "caudales.csv" esté en carpeta "data". En "src" están los códigos de ánalisis: se escribieron en python 3 y se realizaron copias para jupyter notebook.
 
